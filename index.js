@@ -18,24 +18,24 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
-// function jwtVerify(req, res, next) {
-//   const authHeader = req.headers.authorization;
-//   if (!authHeader) {
-//     return res.status(401).send({ messege: "unvalid token" });
-//   }
-//   const token = authHeader.split(" ")[1];
-//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
-//     if (err) return res.status(403).send({ messege: "forbidden token" });
-//     req.decoded = decoded;
-//     next();
-//   });
-// }
-
-const getJWTToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_SECRET_EXPIRE,
+function jwtVerify(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({ messege: "unvalid token" });
+  }
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+    if (err) return res.status(403).send({ messege: "forbidden token" });
+    req.decoded = decoded;
+    next();
   });
-};
+}
+
+// const getJWTToken = function () {
+//   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+//     expiresIn: process.env.JWT_SECRET_EXPIRE,
+//   });
+// };
 
 async function run() {
   try {
@@ -75,11 +75,26 @@ async function run() {
       res.send(bookings);
     });
     // all post routes
-    app.post("/jwt", (req, res) => {
-      const user = req.body;
-      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
-      res.send({ token });
-      console.log(token);
+    // app.post("/jwt", (req, res) => {
+    //   const user = req.body;
+    //   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+    //   res.send({ token });
+    //   console.log(token);
+    // });
+
+    app.get("/jwt", async (req, res) => {
+      const email = req.query.email;
+
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      if (user) {
+        const token = jwt.sign({ email }, process.env.JWT_SECRET, {
+          expiresIn: process.env.JWT_SECRET_EXPIRE,
+        });
+        return res.send({ accessToken: token });
+      }
+
+      res.status(403).send({ token: "unAuthorize" });
     });
 
     // category post
@@ -90,77 +105,79 @@ async function run() {
     });
 
     // login and register with jwt token
-
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const setUser = await userCollection.insertOne(user);
+      res.send(setUser);
+    });
     // register users
-    app.post("/user/register", async (req, res) => {
-      const { email, password, userName, role } = req.body;
-      const user = {
-        email,
-        // password: bcrypt.hash(password, 10),
-        password,
-        userName,
-        role: role ? role : "buyer",
-        isVarified: false,
-      };
-      const query = { email };
-      const cursor = await userCollection.find(query).toArray();
-      const isExist = cursor.find((mail) => mail.email === email);
+    // app.post("/user/register", async (req, res) => {
+    //   const { email, password, userName, role } = req.body;
+    //   const user = {
+    //     email,
+    //     // password: bcrypt.hash(password, 10),
+    //     password,
+    //     userName,
+    //     role: role ? role : "buyer",
+    //     isVarified: false,
+    //   };
+    //   const query = { email };
+    //   const cursor = await userCollection.find(query).toArray();
+    //   const isExist = cursor.find((mail) => mail.email === email);
 
-      if (!isExist) {
-        const result = await userCollection.insertOne(user);
+    //   if (!isExist) {
+    //     const result = await userCollection.insertOne(user);
 
-        res.send({
-          success: true,
-          user: result,
-          token: getJWTToken(),
-        });
-      } else {
-        res.send("user already exist");
-      }
-    });
+    //     res.send({
+    //       success: true,
+    //       user: result,
+    //       token: getJWTToken(),
+    //     });
+    //   } else {
+    //     res.send("user already exist");
+    //   }
+    // });
 
-    app.post("/users", async (req, res) => {});
-
-    app.post("/user/login", async (req, res) => {
-      const { email, password } = req.body;
-      if (!email || !password) {
-        res.send("please enter email and password");
-      }
-      const user = await userCollection.findOne({ email });
-      if (!user) {
-        res.send("Invalid email or password");
-      }
-      if (password !== user.password) {
-        res.send("Invalid email or password");
-      }
-      const sendToken = (user, statusCode, res) => {
-        const token = getJWTToken();
-        const options = {
-          expiresIn: new Date(
-            Date.now + process.env.COOKIE_EXPIRATION * 24 * 60 * 60 * 1000
-          ),
-          httpOnly: true,
-        };
-        res.status(statusCode).cookie("token", token, options).json({
-          success: true,
-          user,
-          token,
-        });
-      };
-      sendToken(user, 201, res);
-    });
+    // app.post("/user/login", async (req, res) => {
+    //   const { email, password } = req.body;
+    //   if (!email || !password) {
+    //     res.send("please enter email and password");
+    //   }
+    //   const user = await userCollection.findOne({ email });
+    //   if (!user) {
+    //     res.send("Invalid email or password");
+    //   }
+    //   if (password !== user.password) {
+    //     res.send("Invalid email or password");
+    //   }
+    //   const sendToken = (user, statusCode, res) => {
+    //     const token = getJWTToken();
+    //     const options = {
+    //       expiresIn: new Date(
+    //         Date.now + process.env.COOKIE_EXPIRATION * 24 * 60 * 60 * 1000
+    //       ),
+    //       httpOnly: true,
+    //     };
+    //     res.status(statusCode).cookie("token", token, options).json({
+    //       success: true,
+    //       user,
+    //       token,
+    //     });
+    //   };
+    //   sendToken(user, 201, res);
+    // });
 
     // logout
-    app.get("/user/logout", async (req, res) => {
-      res.cookie("token", null, {
-        expiresIn: new Date(Date.now()),
-        httpOnly: true,
-      });
-      res.status(200).json({
-        success: true,
-        message: "Logged out successfully",
-      });
-    });
+    // app.get("/user/logout", async (req, res) => {
+    //   res.cookie("token", null, {
+    //     expiresIn: new Date(Date.now()),
+    //     httpOnly: true,
+    //   });
+    //   res.status(200).json({
+    //     success: true,
+    //     message: "Logged out successfully",
+    //   });
+    // });
     // all users
     app.get("/users", async (req, res) => {
       const query = {};
@@ -174,26 +191,26 @@ async function run() {
       const users = await userCollection.findOne(query);
       res.send(users);
     });
-    app.delete("/users/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await userCollection.deleteOne(query);
-      res.send(result);
-    });
+    // app.delete("/users/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: ObjectId(id) };
+    //   const result = await userCollection.deleteOne(query);
+    //   res.send(result);
+    // });
 
-    // register users
-    app.post("/user/register", async (req, res) => {
-      const { email, password, userName, role } = req.body;
-      const user = {
-        email,
-        password,
-        userName,
-        role: role ? role : "buyer",
-        isVarified: false,
-      };
-      const result = await userCollection.insertOne(user);
-      res.send(result);
-    });
+    // // register users
+    // app.post("/user/register", async (req, res) => {
+    //   const { email, password, userName, role } = req.body;
+    //   const user = {
+    //     email,
+    //     password,
+    //     userName,
+    //     role: role ? role : "seller",
+    //     isVarified: false,
+    //   };
+    //   const result = await userCollection.insertOne(user);
+    //   res.send(result);
+    // });
   } finally {
   }
 }
