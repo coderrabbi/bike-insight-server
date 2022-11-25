@@ -1,0 +1,64 @@
+[
+  {
+    "imgUrl": "https://i.ibb.co/tLHPmTm/01-green-devil-garage-copper-chopper.webp",
+    "title": "Suzuki GSX-R150 ABS",
+    "BikeType": "Sports",
+    "categoryName": "Choppers bikes",
+    "category": "choppers",
+    "condition": "Good",
+    "advertise": false,
+    "purchese": "1 year",
+    "telephone": "0175265987",
+    "location": "Dhaka",
+    "description": "Suzuki GSX R150 is currently the king of speed in Bangladesh. The bike has a powerful FI (fuel injection) engine and this GSX R150 bike is relatively small in size and light so the acceleration of the bike is excellent. Suzuki first launched this model on 02 November 2016 in Indonesia. It has gained a lot of popularity in the South Asian market including Bangladesh through gradual changes. Let's take a brief look at the Suzuki GSX R150 bike.",
+    "buyprice": "420000",
+    "sellprice": "350000"
+  },
+  {
+    "imgUrl": "https://i.ibb.co/r3bzGDJ/photo-1621713939155-e35df91a3262.jpg",
+    "title": "Suzuki GSX-R150 ABS",
+    "BikeType": "Sports",
+    "categoryName": "Naked Bikes ",
+    "category": "naked",
+    "condition": "Good",
+    "advertise": false,
+    "purchese": "1 year",
+    "telephone": "0175265987",
+    "location": "Dhaka",
+    "description": "Suzuki GSX R150 is currently the king of speed in Bangladesh. The bike has a powerful FI (fuel injection) engine and this GSX R150 bike is relatively small in size and light so the acceleration of the bike is excellent. Suzuki first launched this model on 02 November 2016 in Indonesia. It has gained a lot of popularity in the South Asian market including Bangladesh through gradual changes. Let's take a brief look at the Suzuki GSX R150 bike.",
+    "buyprice": "420000",
+    "sellprice": "350000"
+  },
+  {
+    "imgUrl": "https://i.ibb.co/0cdv17x/84623.jpg",
+    "title": "KTM RC 125 Indian (ABS)",
+    "BikeType": "Sports",
+    "condition": "Good",
+    "advertise": false,
+    "purchese": "1 year",
+    "categoryName": "Sports Bikes",
+    "category": "sports",
+    "telephone": "0175265887",
+    "location": "Barisal",
+    "description": "KTM RC 125 is an introductory bike from RC series of Austrian bike manufacturer KTM. KTM is popular worldwide as a bike brand from a modern mature and trustworthy place. In the continuation of this series, some of the KTM bike models are also available in Bangladeshi market. KTM RC 125 is one of them, which is a dashing sports bike.",
+    "buyprice": "470000",
+    "sellprice": "390000"
+  },
+  [
+    {
+      "imgUrl": "https://i.ibb.co/tLHPmTm/01-green-devil-garage-copper-chopper.webp",
+      "categoryName": "Choppers bikes",
+      "category": "choppers"
+    },
+    {
+      "imgUrl": "https://i.ibb.co/r3bzGDJ/photo-1621713939155-e35df91a3262.jpg",
+      "categoryName": "Naked Bikes ",
+      "category": "naked "
+    },
+    {
+      "imgUrl": "https://i.ibb.co/0cdv17x/84623.jpg",
+      "categoryName": "Sports Bikes",
+      "category": "sports"
+    }
+  ]
+]
