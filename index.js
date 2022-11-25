@@ -31,12 +31,6 @@ function jwtVerify(req, res, next) {
   });
 }
 
-// const getJWTToken = function () {
-//   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-//     expiresIn: process.env.JWT_SECRET_EXPIRE,
-//   });
-// };
-
 async function run() {
   try {
     const bikesCollection = client.db("bikeInsight").collection("bikes");
@@ -68,19 +62,12 @@ async function run() {
       res.send(product);
     });
 
-    app.get("/bookings/", async (req, res) => {
+    app.get("/bookings/", jwtVerify, async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
       const bookings = await bookinsCollection.find(query).toArray();
       res.send(bookings);
     });
-    // all post routes
-    // app.post("/jwt", (req, res) => {
-    //   const user = req.body;
-    //   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
-    //   res.send({ token });
-    //   console.log(token);
-    // });
 
     app.get("/jwt", async (req, res) => {
       const email = req.query.email;
