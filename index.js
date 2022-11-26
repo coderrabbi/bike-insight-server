@@ -3,7 +3,12 @@ const app = express();
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const {
+  MongoClient,
+  ServerApiVersion,
+  ObjectId,
+  ObjectID,
+} = require("mongodb");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 // middleware
@@ -102,6 +107,30 @@ async function run() {
       const setUser = await userCollection.insertOne(user);
       res.send(setUser);
     });
+    // products get
+    app.get("/products", async (req, res) => {
+      const query = {};
+      const product = await productsCollection.find(query).toArray();
+      res.send(product);
+    });
+    app.get("/products", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const bookings = await productsCollection.find(query).toArray();
+      res.send(bookings);
+    });
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const bookings = await productsCollection.findOne(query);
+      res.send(bookings);
+    });
+    app.delete("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const newProduct = await productsCollection.deleteOne(query);
+      res.send(newProduct);
+    });
 
     // all users
     app.get("/users", async (req, res) => {
@@ -121,11 +150,23 @@ async function run() {
         email: user?.email,
       });
     });
+    app.get("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const bookings = await bookinsCollection.findOne(query);
+      res.send(bookings);
+    });
     app.delete("/users/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const newReview = await userCollection.deleteOne(query);
       res.send(newReview);
+    });
+    app.delete("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const newBookings = await bookinsCollection.deleteOne(query);
+      res.send(newBookings);
     });
   } finally {
   }
