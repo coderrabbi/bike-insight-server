@@ -3,7 +3,7 @@ const app = express();
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 // middleware
@@ -110,11 +110,22 @@ async function run() {
       const users = await cursor.toArray();
       res.send(users);
     });
-    app.get("/users/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const users = await userCollection.findOne(query);
-      res.send(users);
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      res.send({
+        isAdmin: user?.role === "admin",
+        isSeller: user?.role === "seller",
+        email: user?.email,
+      });
+    });
+    app.delete("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const newReview = await userCollection.deleteOne(query);
+      res.send(newReview);
     });
   } finally {
   }
