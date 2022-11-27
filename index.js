@@ -9,6 +9,9 @@ const {
   ObjectId,
   ObjectID,
 } = require("mongodb");
+const stripe = require("stripe")(
+  "sk_test_51M8SDWAdpdqyZqEI8qp8BeNGgnNjw53ozYEq95sRoZGRlB37xbeBKfcrAPoMO19kdR82ryYjyFC8MS65mEHafQtd00TN7zMGd8"
+);
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 // middleware
@@ -45,6 +48,7 @@ async function run() {
     const bikesCategoryCollection = client
       .db("bikeInsight")
       .collection("bikesCategory");
+    const paymentsCollection = client.db("bikeInsight").collection("payments");
     // all get routes
 
     app.get("/", (req, res) => {
@@ -150,6 +154,61 @@ async function run() {
         email: user?.email,
       });
     });
+
+    // stripe
+
+    app.post("/create-payment-intent", async (req, res) => {
+      const booking = req.body;
+      const price = booking.sellprice;
+      const amount = price * 100;
+      const paymentIntent = await stripe.paymentIntents.create({
+        currency: "usd",
+        amount: amount,
+        payment_method_types: ["card"],
+      });
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    });
+
+    app.post("/payments", async (req, res) => {
+      const payment = req.body;
+      console.log(payment);
+      const result = await paymentsCollection.insertOne(payment);
+      const id = payment.bookingId;
+      const filter = { _id: ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          paid: true,
+          transactionId: payment.transactionId,
+        },
+      };
+      const updatedResult = await bookinsCollection.updateOne(
+        filter,
+        updatedDoc
+      );
+      res.send(result, updatedResult);
+    });
+
+    // adviertise route
+
+    app.patch("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const advertiseItem = req.body;
+      const updateAdvertiseItem = {
+        $set: {
+          advertise: advertiseItem.advertise,
+        },
+      };
+      const result = await productsCollection.updateOne(
+        query,
+        updateAdvertiseItem
+      );
+      res.send(result);
+      console.log(advertiseItem);
+    });
+
     app.get("/bookings/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
