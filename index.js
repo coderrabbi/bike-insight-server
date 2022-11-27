@@ -112,6 +112,12 @@ async function run() {
       res.send(setUser);
     });
     // products get
+    app.get("/products/advertise", async (req, res) => {
+      const advertise = (req.query.advertise = true);
+      const query = { advertise: advertise };
+      const adItems = await productsCollection.find(query).toArray();
+      res.send(adItems);
+    });
     app.get("/products", async (req, res) => {
       const query = {};
       const product = await productsCollection.find(query).toArray();
@@ -145,7 +151,6 @@ async function run() {
     });
     app.get("/users/:email", async (req, res) => {
       const email = req.params.email;
-
       const query = { email: email };
       const user = await userCollection.findOne(query);
       res.send({
@@ -155,6 +160,37 @@ async function run() {
       });
     });
 
+    // veridyUser
+
+    app.put("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const userReq = req.body;
+      const options = { uspsert: true };
+      const updateUserReq = {
+        $set: {
+          userVerify: userReq.varify,
+        },
+      };
+      const result = await userCollection.updateOne(
+        query,
+        updateUserReq,
+        options
+      );
+      res.send(result);
+    });
+    app.patch("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const veified = req.body;
+      const updateUserReq = {
+        $set: {
+          userVerify: veified.veified,
+        },
+      };
+      const result = await userCollection.updateOne(query, updateUserReq);
+      res.send(result);
+    });
     // stripe
 
     app.post("/create-payment-intent", async (req, res) => {
