@@ -2,17 +2,12 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const port = process.env.PORT || 5000;
-const {
-  MongoClient,
-  ServerApiVersion,
-  ObjectId,
-  ObjectID,
-} = require("mongodb");
-const stripe = require("stripe")(
-  "sk_test_51M8SDWAdpdqyZqEI8qp8BeNGgnNjw53ozYEq95sRoZGRlB37xbeBKfcrAPoMO19kdR82ryYjyFC8MS65mEHafQtd00TN7zMGd8"
-);
 require("dotenv").config();
+const port = process.env.PORT || 5000;
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+
+const stripe = require("stripe")(process.env.STRIPE_SECRECT_KEY);
+
 const cookieParser = require("cookie-parser");
 // middleware
 app.use(express.json());
@@ -123,7 +118,7 @@ async function run() {
       const product = await productsCollection.find(query).toArray();
       res.send(product);
     });
-    app.get("/products", async (req, res) => {
+    app.get("/products", jwtVerify, async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
       const bookings = await productsCollection.find(query).toArray();
@@ -157,6 +152,7 @@ async function run() {
         isAdmin: user?.role === "admin",
         isSeller: user?.role === "seller",
         email: user?.email,
+        userVerify: user?.userVerify,
       });
     });
 
@@ -209,9 +205,9 @@ async function run() {
 
     app.post("/payments", async (req, res) => {
       const payment = req.body;
-      console.log(payment);
       const result = await paymentsCollection.insertOne(payment);
       const id = payment.bookingId;
+
       const filter = { _id: ObjectId(id) };
       const updatedDoc = {
         $set: {
@@ -223,9 +219,8 @@ async function run() {
         filter,
         updatedDoc
       );
-      res.send(result, updatedResult);
+      res.status(201).send(result, updatedResult);
     });
-
     // adviertise route
 
     app.patch("/products/:id", async (req, res) => {
