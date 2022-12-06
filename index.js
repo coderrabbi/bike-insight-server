@@ -67,7 +67,7 @@ async function run() {
       res.send(product);
     });
 
-    app.get("/bookings/", jwtVerify, async (req, res) => {
+    app.get("/bookings", async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
       const bookings = await bookinsCollection.find(query).toArray();
@@ -118,7 +118,7 @@ async function run() {
       const product = await productsCollection.find(query).toArray();
       res.send(product);
     });
-    app.get("/products", jwtVerify, async (req, res) => {
+    app.get("/products", async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
       const bookings = await productsCollection.find(query).toArray();
