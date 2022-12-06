@@ -10,6 +10,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRECT_KEY);
 
 const cookieParser = require("cookie-parser");
 // middleware
+// middleware
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
